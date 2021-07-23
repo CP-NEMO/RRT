@@ -39,7 +39,7 @@ class env:
 			if c==0: break	
 		return c
 
-#check if newly added sample is in the free configuration space
+#check if newly added sample is in the free configuration space, Checks if the random generated coordinates are in free zone and not in between obstacles
 	def isfree(self):
 		n= G.number_of_nodes()-1
 		(x,y)= (G.x[n], G.y[n]) 
@@ -150,16 +150,16 @@ class RRT:
 	#nearest node
 	def near(self,n):
 		#find a near node
-		dmin = self.metric(0,n)
+		dmin = self.metric(0,n) # Distance between Last node and New random point
 		nnear = 0
-		for i in range(0,n):
-			if self.metric(i,n) < dmin:
+		for i in range(0,n): # compare distance between every node in the list and that random point generated recently 
+			if self.metric(i,n) < dmin: #if any node have smaller distance than dmin then then put that node distance inside in dmin and give the index of that node to nnear
 				dmin=self.metric(i,n)
 				nnear = i
-		return nnear
+		return nnear #after all the itterations nnear will contain the nearest node index value to that random point generated
 		
-#step size
-	def step(self,nnear,nrand):
+#step size   # this functions checks if the distance form bewteen the new node and the previous node is in the range of step size predeclared
+	def step(self,nnear,nrand): #nrand = new node number
 		d = self.metric(nnear,nrand)
 		if d>dmax:
 			u=dmax/d
@@ -346,8 +346,8 @@ class RRT:
 nmax = 1000
 
 #goal region
-xg=5
-yg=5
+xg=int(input("Give End point x: "))
+yg=int(input("Give End point y: "))
 epsilon=5
 xgmin=xg-epsilon
 xgmax=xg+epsilon
@@ -356,8 +356,11 @@ ygmax=yg+epsilon
 
 #extend step size
 dmax = 5
+
+ra = int(input("Give starting point  x: "))
+rb = int(input("Give starting point  Y :"))
 #start the root of the tree
-nstart =(100,100) 
+nstart =(ra,rb) 
 
 #specify vertices for rectangular obstacles (each object has four vertices)
 #obstacles known a priori
@@ -408,25 +411,23 @@ def draw ():
 
 
 #--------------------------------------RRT Implementation---------------------------------
-def main():
-	#balance between extending and biasing	
-	for i in range(0,nmax):
-		if i%10!=0: G.expand()
-		else: G.bias()
-	#check if sample is in goal, if so STOP!		
-		if E.ingoal()==1:
-			break
-	plt.text(45, 103, 'Loops: %d' %(i+1))
-	G.path_to_goal()
-	G.prun()
-		
-	#display initial plan under limited sensing
-	draw()
+
+#balance between extending and biasing	
+for i in range(0,nmax):
+	if i%10!=0: G.expand()
+	else: G.bias()
+#check if sample is in goal, if so STOP!		
+	if E.ingoal()==1:
+		break
+plt.text(45, 103, 'Loops: %d' %(i+1))
+G.path_to_goal()
+G.prun()
+	
+#display initial plan under limited sensing
+draw()
 	
 	
 
 	
 	
-# run main when RRT is called
-if __name__ == '__main__':
-    main()
+
